@@ -135,6 +135,7 @@ resource "local_file" "file" {
     content = tls_private_key.cuong_rsa.private_key_pem
     filename = "cuong_key_test"
 }
+#
 */
 resource "aws_instance" "vm" {
     subnet_id = aws_subnet.container_subnet_1.id
