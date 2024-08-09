@@ -4,56 +4,57 @@ terraform {
       key = "tfstate/terraform.tfstate"
       region = "ap-southeast-2"
       encrypt = true
-#      profile = "dsting"
     }
 }
 
 provider "aws" {
     region =  var.aws-region
-
-#    profile = "dc1testing"
+    #profile = "user1"
 }
 
 
-resource "aws_vpc" "tf-testing-vpc" {
+resource "aws_vpc" "main-vpc" {
     cidr_block = var.cidr-block
     tags = {
-        vpc = "dc1testing-vpc"
+        Name = "main-vpc"
+        vpc = "main-vpc"
     }
 }
 
 resource "aws_internet_gateway" "internet-gateway" {
-    vpc_id = aws_vpc.tf-testing-vpc.id
+    vpc_id = aws_vpc.main-vpc.id
     tags = {
-        internet-gateway = "dc1testing-internet-gateway"
+        Name = "internet-gateway"
+        internet-gateway = "internet-gateway"
     }
 }
 
 resource "aws_route_table" "vpc-route" {
-    vpc_id = aws_vpc.tf-testing-vpc.id
-    route {
+    vpc_id = aws_vpc.main-vpc.id
+    /*route {
         cidr_block = "10.10.0.0/16"
         gateway_id = "local"
     }
+    */
     route {
         cidr_block = "0.0.0.0/0"
         gateway_id = aws_internet_gateway.internet-gateway.id
     }
 }
 
-resource "aws_route_table_association" "vpc-route-associate" {
-    subnet_id = aws_subnet.testing-subnet.id
+resource "aws_route_table_association" "vpc-route-associate-1" {
+    subnet_id = aws_subnet.container_subnet_1.id
     route_table_id = aws_route_table.vpc-route.id
 }
 
 resource "aws_route_table_association" "vpc-route-associate-2" {
-    subnet_id = aws_subnet.testing-subnet-2.id
+    subnet_id = aws_subnet.container_subnet_2.id
     route_table_id = aws_route_table.vpc-route.id
 }
 
 resource "aws_security_group" "security-group" {
-    vpc_id = aws_vpc.tf-testing-vpc.id
-    name = "securitygroup-testing"
+    vpc_id = aws_vpc.main-vpc.id
+    name = "security-group"
     ingress {
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
@@ -73,7 +74,7 @@ resource "aws_security_group" "security-group" {
         to_port = 65535
     }
     tags = {
-        security-group = "dc1-security-group"
+        security-group = "security-group"
     }
     
 }
@@ -81,10 +82,7 @@ resource "aws_security_group" "security-group" {
 resource "aws_vpc_security_group_ingress_rule" "ingress-allow-all" {
     security_group_id = aws_security_group.security-group.id
     ip_protocol = "-1"
-    cidr_ipv4 = "0.0.0.0/0"
-#    from_port = 80
-#    to_port = 80
-  
+    cidr_ipv4 = "0.0.0.0/0" 
 }
 
 resource "aws_vpc_security_group_egress_rule" "egress-allow-all" {
@@ -93,22 +91,24 @@ resource "aws_vpc_security_group_egress_rule" "egress-allow-all" {
     ip_protocol = "-1"
 }
 
-resource "aws_subnet" "testing-subnet" {
-    vpc_id = aws_vpc.tf-testing-vpc.id
-    cidr_block = "10.10.10.0/24"
+resource "aws_subnet" "container_subnet_1" {
+    vpc_id = aws_vpc.main-vpc.id
+    cidr_block = "10.0.1.0/24"
     availability_zone = "ap-southeast-2a"
     tags = {
-        subnet = "dc1-testing-subnet2a-web-server"
+        Name = "container_subnet_1"
+        subnet = "container_subnet_1-web-server"
     }
 
 }
 
-resource "aws_subnet" "testing-subnet-2" {
-    vpc_id = aws_vpc.tf-testing-vpc.id
-    cidr_block = "10.10.11.0/24"
+resource "aws_subnet" "container_subnet_2" {
+    vpc_id = aws_vpc.main-vpc.id
+    cidr_block = "10.0.2.0/24"
     availability_zone = "ap-southeast-2b"
     tags = {
-        subnet = "dc1-testing-subnet2b-web-server"
+        Name = "container_subnet_2"
+        subnet = "container_subnet_2-web-server"
     }
   
 }
@@ -118,17 +118,17 @@ resource "aws_eip" "elastic-ip" {
     instance = aws_instance.vm.id 
 }
 
-resource "aws_key_pair" "demoenvkey" {
-  key_name   = "demoenvkey"
+resource "aws_key_pair" "cuong_key" {
+  key_name   = "cuong_key"
   public_key = var.public-key
 }
 
 resource "aws_instance" "vm" {
-    subnet_id = aws_subnet.testing-subnet.id
+    subnet_id = aws_subnet.container_subnet_1.id
     ami = var.ami
     instance_type = var.instance-type
     vpc_security_group_ids = [ aws_security_group.security-group.id ]
-    key_name = aws_key_pair.demoenvkey.id
+    key_name = aws_key_pair.cuong_key.id
     user_data = "${file("install_nginx.sh")}"
     tags = {
         server = "dc1-webserver"
@@ -136,16 +136,17 @@ resource "aws_instance" "vm" {
 
 }
 
-resource "aws_db_subnet_group" "testing-dbsubnet" {
-    subnet_ids = [ aws_subnet.testing-subnet.id, aws_subnet.testing-subnet-2.id ]
+resource "aws_db_subnet_group" "db_subnet_group" {
+    subnet_ids = [ aws_subnet.container_subnet_1.id, container_subnet_2.id ]
     name = "testing-db-subnet"
     tags = {
-        dbsubnet = "testing-dbsubnet"
+        Name = "db_subnet_group"
+        dbsubnet = "db_subnet_group"
     }
 }
 
 resource "aws_db_instance" "database" {
-    db_subnet_group_name = aws_db_subnet_group.testing-dbsubnet.id
+    db_subnet_group_name = aws_db_subnet_group.db_subnet_group.id
     allocated_storage = 10
     db_name = "dbtesting"
     engine = "mysql"
@@ -157,14 +158,11 @@ resource "aws_db_instance" "database" {
     skip_final_snapshot = true
     vpc_security_group_ids = [ aws_security_group.security-group.id ]
     tags = {
-        database = "dc1-database-testing"
+        Name = "main-database"
+        database = "database"
     }
 
 }
 
 
 
-//resource "aws_internet_gateway_attachment" "internet-gateway-attachment" {
-//    internet_gateway_id = aws_internet_gateway.internet-gateway.id
-//    vpc_id = aws_vpc.tf-testing-vpc.id
-//}
