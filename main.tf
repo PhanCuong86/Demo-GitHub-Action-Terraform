@@ -9,7 +9,7 @@ terraform {
 
 provider "aws" {
     region =  var.aws-region
-    #profile = "user1"
+    #profile = "user1test"
 }
 
 
