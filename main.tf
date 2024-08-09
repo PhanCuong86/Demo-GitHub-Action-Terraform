@@ -119,7 +119,7 @@ resource "aws_eip" "elastic-ip" {
 }
 
 resource "aws_key_pair" "cuong_key_new" {
-  key_name   = "cuong_key_new"
+  key_name   = "cuong_key_new_2"
   public_key = var.public-key
 }
 
