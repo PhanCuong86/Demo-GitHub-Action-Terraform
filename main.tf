@@ -118,8 +118,8 @@ resource "aws_eip" "elastic-ip" {
     instance = aws_instance.vm.id 
 }
 #testttt
-resource "aws_key_pair" "key_cuong_new_public" {
-  key_name   = "key_cuong_new_public"
+resource "aws_key_pair" "key_cuong_new" {
+  key_name   = "key-cuong-new"
   public_key = var.public-key
 }
 /*
@@ -142,7 +142,7 @@ resource "aws_instance" "vm" {
     ami = var.ami
     instance_type = var.instance-type
     vpc_security_group_ids = [ aws_security_group.security-group.id ]
-    key_name = aws_key_pair.key_cuong_new_public.id
+    key_name = aws_key_pair.key_cuong_new.id
     user_data = "${file("install_nginx.sh")}"
     tags = {
         server = "dc1-webserver"
