@@ -118,11 +118,11 @@ resource "aws_eip" "elastic-ip" {
     instance = aws_instance.vm.id 
 }
 #test
-/*resource "aws_key_pair" "cuong_key_new" {
-  key_name   = "cuong_key_new_2"
+resource "aws_key_pair" "key_cuong_new_public" {
+  key_name   = "key_cuong_new_public"
   public_key = var.public-key
 }
-*/
+/*
 resource "aws_key_pair" "cuong_key_test" {
     key_name = "cuong_key_test"
     public_key = tls_private_key.cuong_rsa.public_key_openssh
@@ -135,13 +135,13 @@ resource "local_file" "file" {
     content = tls_private_key.cuong_rsa.private_key_pem
     filename = "cuong_key_test"
 }
-
+*/
 resource "aws_instance" "vm" {
     subnet_id = aws_subnet.container_subnet_1.id
     ami = var.ami
     instance_type = var.instance-type
     vpc_security_group_ids = [ aws_security_group.security-group.id ]
-    key_name = "cuong_key_test"
+    key_name = aws_key_pair.key_cuong_new_public.id
     user_data = "${file("install_nginx.sh")}"
     tags = {
         server = "dc1-webserver"
