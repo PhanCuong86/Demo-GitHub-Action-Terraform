@@ -144,7 +144,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
         dbsubnet = "db_subnet_group"
     }
 }
-
+#
 resource "aws_db_instance" "database" {
     db_subnet_group_name = aws_db_subnet_group.db_subnet_group.id
     allocated_storage = 10
