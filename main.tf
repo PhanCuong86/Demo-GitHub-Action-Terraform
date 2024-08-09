@@ -118,8 +118,8 @@ resource "aws_eip" "elastic-ip" {
     instance = aws_instance.vm.id 
 }
 
-resource "aws_key_pair" "cuong_key" {
-  key_name   = "cuong_key"
+resource "aws_key_pair" "cuong_key_new" {
+  key_name   = "cuong_key_new"
   public_key = var.public-key
 }
 
@@ -128,7 +128,7 @@ resource "aws_instance" "vm" {
     ami = var.ami
     instance_type = var.instance-type
     vpc_security_group_ids = [ aws_security_group.security-group.id ]
-    key_name = aws_key_pair.cuong_key.id
+    key_name = aws_key_pair.cuong_key_new.id
     user_data = "${file("install_nginx.sh")}"
     tags = {
         server = "dc1-webserver"
@@ -138,7 +138,7 @@ resource "aws_instance" "vm" {
 
 resource "aws_db_subnet_group" "db_subnet_group" {
     subnet_ids = [ aws_subnet.container_subnet_1.id, aws_subnet.container_subnet_2.id ]
-    name = "testing-db-subnet"
+    name = "db-subnet-group"
     tags = {
         Name = "db_subnet_group"
         dbsubnet = "db_subnet_group"
