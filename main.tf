@@ -135,7 +135,7 @@ resource "aws_instance" "vm" {
     }
 
 }
-#
+
 resource "aws_db_subnet_group" "db_subnet_group" {
     subnet_ids = [ aws_subnet.container_subnet_1.id, aws_subnet.container_subnet_2.id ]
     name = "db-subnet-group"
