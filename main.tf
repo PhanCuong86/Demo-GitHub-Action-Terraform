@@ -117,7 +117,7 @@ resource "aws_eip" "elastic-ip" {
     domain = "vpc"
     instance = aws_instance.vm.id 
 }
-
+#test
 resource "aws_key_pair" "cuong_key_new" {
   key_name   = "cuong_key_new_2"
   public_key = var.public-key
@@ -145,6 +145,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
     }
 }
 #f
+
 resource "aws_db_instance" "database" {
     db_subnet_group_name = aws_db_subnet_group.db_subnet_group.id
     allocated_storage = 10
