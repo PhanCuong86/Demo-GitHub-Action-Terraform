@@ -70,11 +70,11 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
     - name: Create env by CloudFormation
-      run: aws cloudformation deploy --template-file cf.yaml --stack-name demoenv
+      run: aws cloudformation deploy --template-file cf.yaml --stack-name cuongdemoenv
     - name: Get Stack EIP 
-      run: aws cloudformation describe-stacks --region ap-southeast-2 --query 'Stacks[?StackName==`demoenv`][].Outputs[?OutputKey==`StackEIPGeneral`].OutputValue' --output text
+      run: aws cloudformation describe-stacks --region ap-southeast-2 --query 'Stacks[?StackName==`cuongdemoenv`][].Outputs[?OutputKey==`StackEIPGeneral`].OutputValue' --output text
     - name: Get Cloudformation Output EIP 
-      run: echo cip=$(aws cloudformation describe-stacks --region ap-southeast-2 --query 'Stacks[?StackName==`demoenv`][].Outputs[?OutputKey==`StackEIPGeneral`].OutputValue' --output text) >> $GITHUB_ENV
+      run: echo cip=$(aws cloudformation describe-stacks --region ap-southeast-2 --query 'Stacks[?StackName==`cuongdemoenv`][].Outputs[?OutputKey==`StackEIPGeneral`].OutputValue' --output text) >> $GITHUB_ENV
     - name: deploy code to cloudformation environment
       run: |
         echo "$PRIVATE_KEY" > cuong_key_rsa && chmod 600 cuong_key_rsa
@@ -85,6 +85,6 @@ jobs:
     - name: testing site that created by cloudformation
       run: curl http://$cip
     - name: Describe stack events  
-      run: aws cloudformation describe-stack-events --stack-name demoenv
+      run: aws cloudformation describe-stack-events --stack-name cuongdemoenv
     - name: Delete env by Cloudformation
-      run: aws cloudformation delete-stack --stack-name demoenv
+      run: aws cloudformation delete-stack --stack-name cuongdemoenv
