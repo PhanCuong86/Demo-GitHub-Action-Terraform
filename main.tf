@@ -117,7 +117,7 @@ resource "aws_eip" "elastic-ip" {
     domain = "vpc"
     instance = aws_instance.main_ec2.id 
 }
-#test ec2 
+#test ec2 t
 resource "aws_key_pair" "cuong_key_rsa" {
   key_name   = "cuong_key_rsa"
   public_key = var.public-key
