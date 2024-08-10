@@ -115,7 +115,7 @@ resource "aws_subnet" "container_subnet_2" {
 
 resource "aws_eip" "elastic-ip" {
     domain = "vpc"
-    instance = aws_instance.vm.id 
+    instance = aws_instance.main_ec2.id 
 }
 #test ec2 
 resource "aws_key_pair" "cuong_key_rsa" {
@@ -123,7 +123,7 @@ resource "aws_key_pair" "cuong_key_rsa" {
   public_key = var.public-key
 }
 
-resource "aws_instance" "vm" {
+resource "aws_instance" "main_ec2" {
     subnet_id = aws_subnet.container_subnet_1.id
     ami = var.ami
     instance_type = var.instance-type
@@ -131,7 +131,8 @@ resource "aws_instance" "vm" {
     key_name = aws_key_pair.cuong_key_rsa.id
     user_data = "${file("install_nginx.sh")}"
     tags = {
-        server = "dc1-webserver"
+        Name ="main-ec2" 
+        server = "ec2-webserver"
     }
 
 }
@@ -144,7 +145,6 @@ resource "aws_db_subnet_group" "db_subnet_group" {
         dbsubnet = "db_subnet_group"
     }
 }
-#f
 
 resource "aws_db_instance" "database" {
     db_subnet_group_name = aws_db_subnet_group.db_subnet_group.id
@@ -153,8 +153,8 @@ resource "aws_db_instance" "database" {
     engine = "mysql"
     engine_version = "8.0"
     instance_class = "db.t3.micro"
-    username = "dc1testing"
-    password = "dc1testing"
+    username = "admin"
+    password = "password"
     parameter_group_name = "default.mysql8.0"
     skip_final_snapshot = true
     vpc_security_group_ids = [ aws_security_group.security-group.id ]
@@ -162,7 +162,6 @@ resource "aws_db_instance" "database" {
         Name = "main-database"
         database = "database"
     }
-
 }
 
 
