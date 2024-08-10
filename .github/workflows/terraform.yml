@@ -45,7 +45,7 @@ jobs:
       run: echo ip=$(terraform output -raw eip-public-ip) >> $GITHUB_ENV
     - name: deploy code to terraform environment
       run: |
-        echo "$PRIVATE_KEY" > key-cuong-new.pem && chmod 400 key-cuong-new.pem
+        echo "$PRIVATE_KEY" > key-cuong-new.pem && chmod 600 key-cuong-new.pem
         ssh -o StrictHostKeyChecking=no -i key-cuong-new.pem ${USER_NAME}@${ip} '
           echo "<h1>Hi -- This is GitHub Action Pipeline --- This is latest code with env that created by cloudformation</h1>" | sudo tee /var/www/html/index.nginx-debian.html
         '
