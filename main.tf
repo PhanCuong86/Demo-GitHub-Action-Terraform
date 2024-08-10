@@ -117,26 +117,12 @@ resource "aws_eip" "elastic-ip" {
     domain = "vpc"
     instance = aws_instance.vm.id 
 }
-#test ec2 test
+#test ec2 
 resource "aws_key_pair" "cuong_key_rsa" {
   key_name   = "cuong_key_rsa"
   public_key = var.public-key
 }
-/*
-resource "aws_key_pair" "cuong_key_test" {
-    key_name = "cuong_key_test"
-    public_key = tls_private_key.cuong_rsa.public_key_openssh
-}
-resource "tls_private_key" "cuong_rsa" {
-    algorithm = "RSA"
-    rsa_bits = 4096
-}
-resource "local_file" "file" {
-    content = tls_private_key.cuong_rsa.private_key_pem
-    filename = "cuong_key_test"
-}
-#dfdfd
-*/
+
 resource "aws_instance" "vm" {
     subnet_id = aws_subnet.container_subnet_1.id
     ami = var.ami
